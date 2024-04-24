@@ -2,6 +2,7 @@ package snackscription.subscriptionadmin.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import snackscription.subscriptionadmin.enums.SubscriptionStatus;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,16 +12,13 @@ class AdminSubscriptionTest {
     @BeforeEach
     void setUp() {
         this.adminSubscription = new AdminSubscription();
-        this.adminSubscription.setSubscriberId(1);
         this.adminSubscription.setSubscriberName("Hwang Hyunjin");
-        this.adminSubscription.setSubscriptionType("Monthly");
-        this.adminSubscription.setSubscriptionUniqueCode("123456");
-        this.adminSubscription.setSubscribtionStatus("Pending");
-    }
+        this.adminSubscription.setSubscriberId("12345678910");
+        this.adminSubscription.setSubscriptionId("12345678910");
+        this.adminSubscription.setUniqueCode("MTH-12345678910");
+        this.adminSubscription.setSubscriptionBoxId("12345678910");
 
-    @Test
-    void testGetSubscriberId() {
-        assertEquals(1, this.adminSubscription.getSubscriberId());
+        this.adminSubscription.setSubscriptionStatus(SubscriptionStatus.PENDING.getValue());
     }
 
     @Test
@@ -29,17 +27,40 @@ class AdminSubscriptionTest {
     }
 
     @Test
-    void testGetSubscriptionType() {
-        assertEquals("Monthly", this.adminSubscription.getSubscriptionType());
+    void testGetSubscriberId() {
+        assertEquals("12345678910", this.adminSubscription.getSubscriberId());
     }
 
     @Test
-    void testGetSubscriptionUniqueCode() {
-        assertEquals("123456", this.adminSubscription.getSubscriptionUniqueCode());
+    void testGetSubscriptionId() {
+        assertEquals("12345678910", this.adminSubscription.getSubscriptionId());
     }
 
     @Test
-    void testGetSubscribtionStatus() {
-        assertEquals("Pending", this.adminSubscription.getSubscribtionStatus());
+    void testGetUniqueCode() {
+        assertEquals("MTH-12345678910", this.adminSubscription.getUniqueCode());
+    }
+
+    @Test
+    void testGetSubscriptionBoxId() {
+        assertEquals("12345678910", this.adminSubscription.getSubscriptionBoxId());
+    }
+
+    @Test
+    void testGetSubscriptionStatus() {
+        assertEquals("PENDING", this.adminSubscription.getSubscriptionStatus());
+    }
+
+    @Test
+    void testSetStatus() {
+        this.adminSubscription.setSubscriptionStatus(SubscriptionStatus.SUBSCRIBED.getValue());
+        assertEquals("SUBSCRIBED", this.adminSubscription.getSubscriptionStatus());
+    }
+
+    @Test
+    void testSetInvalidStatus() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            this.adminSubscription.setSubscriptionStatus("INVALID");
+        });
     }
 }

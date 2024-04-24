@@ -2,12 +2,45 @@ package snackscription.subscriptionadmin.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import snackscription.subscriptionadmin.enums.SubscriptionStatus;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter @Setter
 public class AdminSubscription {
-    private String subscriberName;
-    private int subscriberId;
-    private String subscriptionUniqueCode;
-    private String subscriptionType;
-    private String subscribtionStatus;
+    String subscriberName;
+    String subscriberId;
+    String uniqueCode;
+    String subscriptionId;
+    String subscriptionBoxId;
+    String subscriptionStatus;
+
+    public AdminSubscription() {
+        this.subscriptionId = UUID.randomUUID().toString();
+    }
+
+    public AdminSubscription(String subscriberName, String subscriberId, String uniqueCode, String subscriptionBoxId, String subscriptionStatus) {
+        this.subscriptionId = UUID.randomUUID().toString();
+
+        this.subscriberName = subscriberName;
+        this.subscriberId = subscriberId;
+
+        if (!uniqueCode.startsWith("MTH-") && !uniqueCode.startsWith("QTR-") && !uniqueCode.startsWith("SAA-")) {
+            throw new IllegalArgumentException("Invalid unique code");
+        }
+
+        this.uniqueCode = uniqueCode;
+        this.subscriptionBoxId = subscriptionBoxId;
+        this.setSubscriptionStatus(subscriptionStatus);
+    }
+
+    public void setSubscriptionStatus(String subscriptionStatus) {
+        if (SubscriptionStatus.contains(subscriptionStatus)) {
+            this.subscriptionStatus = subscriptionStatus;
+        } else {
+            throw new IllegalArgumentException("Invalid subscription status");
+        }
+    }
+
 }
