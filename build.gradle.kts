@@ -64,11 +64,8 @@ tasks.withType<Test>().configureEach() {
 }
 
 tasks.test {
-	filter {
-		excludeTestsMatching("*FunctionalTest")
-	}
-
-	finalizedBy(tasks.jacocoTestReport)
+	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
 tasks.jacocoTestReport {
