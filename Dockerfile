@@ -11,6 +11,6 @@ ENV JDBC_DATABASE_USERNAME ${JDBC_DATABASE_USERNAME}
 
 WORKDIR /app
 COPY ./subscription-admin-0.0.1.jar /app
-RUN ls -la
+RUN ls -al
 EXPOSE 8080
 CMD ["java","-jar","subscription-admin-0.0.1.jar"]
