@@ -7,4 +7,8 @@ public class AdminSubscriptionFactory implements Factory<AdminSubscription> {
     public AdminSubscription create() {
         return null;
     }
+
+    public AdminSubscription create(String subscriberName, String subscriberId, String uniqueCode, String subscriptionBoxId, String subscriptionStatus) {
+        return null;
+    }
 }

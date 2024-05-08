@@ -7,4 +7,8 @@ public class AdminRepositoryFactory implements Factory<AdminRepository> {
     public AdminRepository create() {
         return null;
     }
+
+    public AdminRepository create(String subscriberName, String subscriberId, String uniqueCode, String subscriptionBoxId, String subscriptionStatus) {
+        return null;
+    }
 }
