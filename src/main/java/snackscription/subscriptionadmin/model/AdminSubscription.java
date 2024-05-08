@@ -32,6 +32,7 @@ public class AdminSubscription {
 
         this.uniqueCode = uniqueCode;
         this.subscriptionBoxId = subscriptionBoxId;
+        this.getSubscriptionStatus();
         this.setSubscriptionStatus(subscriptionStatus);
     }
 

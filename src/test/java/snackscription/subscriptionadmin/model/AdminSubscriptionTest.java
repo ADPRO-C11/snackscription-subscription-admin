@@ -48,19 +48,20 @@ class AdminSubscriptionTest {
 
     @Test
     void testGetSubscriptionStatus() {
-        assertEquals("PENDING", this.adminSubscription.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.PENDING.getValue(), adminSubscription.getSubscriptionStatus());
     }
 
     @Test
-    void testSetStatus() {
+    void testSetSubscriptionStatus() {
         this.adminSubscription.setSubscriptionStatus(SubscriptionStatus.SUBSCRIBED.getValue());
-        assertEquals("SUBSCRIBED", this.adminSubscription.getSubscriptionStatus());
+        assertEquals(SubscriptionStatus.SUBSCRIBED.getValue(), this.adminSubscription.getSubscriptionStatus());
     }
 
     @Test
-    void testSetInvalidStatus() {
+    void testSetIvalidSubscriptionStatus() {
         assertThrows(IllegalArgumentException.class, () -> {
             this.adminSubscription.setSubscriptionStatus("INVALID");
         });
     }
+
 }
