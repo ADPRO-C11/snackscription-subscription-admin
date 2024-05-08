@@ -20,7 +20,7 @@ public class AdminSubscriptionFactoryTest {
         AdminSubscriptionFactory adminSubscriptionFactory = new AdminSubscriptionFactory();
 
         AdminSubscription adminSubscription = adminSubscriptionFactory.create(
-                "Monthly",
+                "MONTHLY",
                 "Hwang Hyunjin",
                 "12345678910",
                 "12345678910"
