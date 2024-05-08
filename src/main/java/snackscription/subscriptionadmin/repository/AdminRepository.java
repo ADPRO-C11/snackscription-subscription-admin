@@ -41,7 +41,7 @@ public class AdminRepository {
 
     @Transactional
     public void delete(String subscriptionId) {
-        AdminSubscription adminSubscription = findById(subscriptionId).orElseThrow(() -> new IllegalArgumentException("Invalid subscription ID"));
+        AdminSubscription adminSubscription = findById(subscriptionId).orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
         entityManager.remove(adminSubscription);
     }
 }

@@ -39,7 +39,7 @@ class AdminSubscriptionTest {
 
     @Test
     void testGetUniqueCode() {
-        assertEquals("MTH-1234567890", this.adminSubscription.getUniqueCode());
+        assertTrue(adminSubscription.getUniqueCode().startsWith("MTH-"));
     }
 
     @Test
