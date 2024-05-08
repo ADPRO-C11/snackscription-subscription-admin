@@ -53,11 +53,12 @@ public class AdminSubscription {
 
     public void setUniqueCode(String subscriptionType) {
         String prefix = switch (subscriptionType) {
-            case "Monthly" -> "MTH-";
-            case "Quarterly" -> "QTR-";
-            case "Semi-Annual" -> "SAA-";
+            case "MONTHLY" -> "MTH-";
+            case "QUARTERLY" -> "QTR-";
+            case "SEMI-ANNUAL" -> "SAA-";
             default -> throw new IllegalArgumentException("Invalid type");
         };
+
         String randomPart = UUID.randomUUID().toString();
         randomPart = randomPart.replace("-", "").toUpperCase().substring(0, 16);
         this.uniqueCode = prefix + randomPart;

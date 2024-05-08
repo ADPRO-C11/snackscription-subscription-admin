@@ -15,10 +15,9 @@ class AdminSubscriptionTest {
         this.adminSubscription.setSubscriberName("Hwang Hyunjin");
         this.adminSubscription.setSubscriberId("12345678910");
         this.adminSubscription.setSubscriptionId("1234567890");
-        this.adminSubscription.setSubscriptionType("Monthly");
-        this.adminSubscription.setUniqueCode("MTH-1234567890");
+        this.adminSubscription.setSubscriptionType("MONTHLY");
+        this.adminSubscription.setUniqueCode("MONTHLY");
         this.adminSubscription.setSubscriptionBoxId("12345678910");
-
         this.adminSubscription.setSubscriptionStatus(SubscriptionStatus.PENDING.getValue());
     }
 
