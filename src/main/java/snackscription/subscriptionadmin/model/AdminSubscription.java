@@ -7,13 +7,25 @@ import snackscription.subscriptionadmin.enums.SubscriptionStatus;
 
 import java.util.UUID;
 
-@Getter @Setter
+@Entity @Getter @Setter
+@Table(name = "admin_subscription")
 public class AdminSubscription {
+    @Column(name = "subscriber_name", nullable = false)
     String subscriberName;
+
+    @Column(name = "subscriber_id", nullable = false)
     String subscriberId;
+
+    @Column(name = "unique_code", nullable = false, unique = true)
     String uniqueCode;
+
+    @Id
     String subscriptionId;
+
+    @Column(name = "subscription_box_id", nullable = false)
     String subscriptionBoxId;
+
+    @Column(name = "subscription_status", nullable = false)
     String subscriptionStatus;
 
     public AdminSubscription() {
