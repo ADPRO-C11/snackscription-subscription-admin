@@ -1,51 +1,66 @@
 package snackscription.subscriptionadmin.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import snackscription.subscriptionadmin.enums.SubscriptionStatus;
 
 import java.util.UUID;
 
-@Entity @Getter @Setter
+@Entity
+@Getter
+@Setter
 @Table(name = "admin_subscription")
 public class AdminSubscription {
-    @Column(name = "subscriber_name", nullable = false)
-    String subscriberName;
-
-    @Column(name = "subscriber_id", nullable = false)
-    String subscriberId;
-
-    @Column(name = "unique_code", nullable = false, unique = true)
-    String uniqueCode;
-
     @Id
     String subscriptionId;
 
-    @Column(name = "subscription_box_id", nullable = false)
+    @Column(name = "unique_code", unique = true)
+    String uniqueCode;
+
+    @Column(name = "subscription_type")
+    String subscriptionType;
+
+    @Column(name = "subscriber_name")
+    String subscriberName;
+
+    @Column(name = "subscriber_id")
+    String subscriberId;
+
+    @Column(name = "subscription_box_id")
     String subscriptionBoxId;
 
-    @Column(name = "subscription_status", nullable = false)
+    @Column(name = "subscription_status")
     String subscriptionStatus;
 
     public AdminSubscription() {
         this.subscriptionId = UUID.randomUUID().toString();
     }
 
-    public AdminSubscription(String subscriberName, String subscriberId, String uniqueCode, String subscriptionBoxId, String subscriptionStatus) {
+    public AdminSubscription(String subscriptionType, String subscriberName, String subscriberId, String subscriptionBoxId) {
         this.subscriptionId = UUID.randomUUID().toString();
 
         this.subscriberName = subscriberName;
         this.subscriberId = subscriberId;
 
-        if (!uniqueCode.startsWith("MTH-") && !uniqueCode.startsWith("QTR-") && !uniqueCode.startsWith("SAA-")) {
-            throw new IllegalArgumentException("Invalid unique code");
-        }
+        this.subscriptionType = subscriptionType;
+        this.setUniqueCode(subscriptionType);
 
-        this.uniqueCode = uniqueCode;
         this.subscriptionBoxId = subscriptionBoxId;
-        this.getSubscriptionStatus();
-        this.setSubscriptionStatus(subscriptionStatus);
+        this.setSubscriptionStatus(SubscriptionStatus.PENDING.getValue());
+    }
+
+    public void setUniqueCode(String subscriptionType) {
+        String prefix = switch (subscriptionType) {
+            case "Monthly" -> "MTH-";
+            case "Quarterly" -> "QTR-";
+            case "Semi-Annual" -> "SAA-";
+            default -> throw new IllegalArgumentException("Invalid type");
+        };
+        String randomPart = UUID.randomUUID().toString();
+        randomPart = randomPart.replace("-", "").toUpperCase().substring(0, 16);
+        this.uniqueCode = prefix + randomPart;
     }
 
     public void setSubscriptionStatus(String subscriptionStatus) {
