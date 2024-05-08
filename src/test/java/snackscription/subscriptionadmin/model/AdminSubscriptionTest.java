@@ -58,7 +58,7 @@ class AdminSubscriptionTest {
     }
 
     @Test
-    void testSetIvalidSubscriptionStatus() {
+    void testSetInvalidSubscriptionStatus() {
         assertThrows(IllegalArgumentException.class, () -> {
             this.adminSubscription.setSubscriptionStatus("INVALID");
         });
