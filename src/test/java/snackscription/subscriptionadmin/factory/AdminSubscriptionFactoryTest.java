@@ -26,7 +26,7 @@ public class AdminSubscriptionFactoryTest {
                 "12345678910",
                 SubscriptionStatus.PENDING.getValue()
         );
-        
+
         assertNotNull(adminSubscription.getSubscriptionId());
         assertEquals("Hwang Hyunjin", adminSubscription.getSubscriberName());
         assertEquals("12345678910", adminSubscription.getSubscriberId());
