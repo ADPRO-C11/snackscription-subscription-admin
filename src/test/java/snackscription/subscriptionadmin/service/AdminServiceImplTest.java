@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+import snackscription.subscriptionadmin.controller.AdminController;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.factory.AdminSubscriptionFactory;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 import snackscription.subscriptionadmin.repository.AdminRepository;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class AdminServiceImplTest {
 
@@ -26,6 +29,7 @@ public class AdminServiceImplTest {
 
     @InjectMocks
     private AdminServiceImpl adminService;
+    private AdminController adminController;
 
     private AdminSubscription adminSubscription;
     private AdminDTO adminDTO;
@@ -55,33 +59,62 @@ public class AdminServiceImplTest {
 
     @Test
     void testCreate() {
-        when(adminRepository.create(any(AdminSubscription.class))).thenReturn(adminSubscription);
+        when(adminRepository.create(adminSubscription)).thenReturn(adminSubscription);
 
-        AdminSubscription result = adminService.create(adminDTO);
+        CompletableFuture<AdminSubscription> result = adminService.create(adminDTO);
 
         assertNotNull(result);
-        assertEquals(adminSubscription, result);
+        assertTrue(result.isDone());
+        assertEquals(adminSubscription, result.join());
     }
 
     @Test
     void testFindAll() {
-        when(adminRepository.findAll()).thenReturn(Collections.singletonList(adminSubscription));
+        List<AdminDTO> adminDTOList = List.of(adminDTO);
 
-        List<AdminDTO> result = adminService.findAll();
+        when(adminService.findAll()).thenReturn(CompletableFuture.completedFuture(adminDTOList));
 
-        assertEquals(1, result.size());
-        assertEquals(adminSubscription.getSubscriptionId(), result.get(0).getSubscriptionId());
+        CompletableFuture<ResponseEntity<List<AdminDTO>>> result = adminController.findAll();
+
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertEquals(ResponseEntity.ok(adminDTOList), result.join());
     }
 
     @Test
     void testFindById() {
-        String subscriptionId = "1";
+        Optional<AdminDTO> adminDTOOptional = Optional.of(adminDTO);
 
-        when(adminRepository.findById(subscriptionId)).thenReturn(java.util.Optional.of(adminSubscription));
+        when(adminRepository.findById(anyString())).thenReturn(Optional.of(adminSubscription));
+        when(adminService.findById(anyString())).thenReturn(CompletableFuture.completedFuture(adminDTOOptional));
 
-        AdminDTO result = adminService.findById(subscriptionId);
+        CompletableFuture<ResponseEntity<Optional<AdminDTO>>> result = adminController.findById("1");
 
         assertNotNull(result);
-        assertEquals(adminSubscription.getSubscriptionId(), result.getSubscriptionId());
+        assertTrue(result.isDone());
+        assertEquals(ResponseEntity.ok(adminDTOOptional), result.join());
+    }
+
+    @Test
+    void testUpdate() {
+        when(adminService.findById(adminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(Optional.of(adminDTO)));
+        when(adminService.update(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
+
+        CompletableFuture<ResponseEntity<AdminSubscription>> result = adminController.update(adminDTO);
+
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertEquals(ResponseEntity.ok(adminSubscription), result.join());
+    }
+
+    @Test
+    void testDelete() {
+        when(adminService.delete(anyString())).thenReturn(CompletableFuture.completedFuture(null));
+
+        CompletableFuture<ResponseEntity<String>> result = adminController.delete("1");
+
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertEquals(ResponseEntity.ok("DELETE SUCCESS"), result.join());
     }
 }
