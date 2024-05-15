@@ -20,17 +20,16 @@ public class AdminSubscriptionFactoryTest {
         AdminSubscriptionFactory adminSubscriptionFactory = new AdminSubscriptionFactory();
 
         AdminSubscription adminSubscription = adminSubscriptionFactory.create(
+                "MONTHLY",
                 "Hwang Hyunjin",
                 "12345678910",
-                "MTH-12345678910",
-                "12345678910",
-                SubscriptionStatus.PENDING.getValue()
+                "12345678910"
         );
 
         assertNotNull(adminSubscription.getSubscriptionId());
+        assertNotNull(adminSubscription.getUniqueCode());
         assertEquals("Hwang Hyunjin", adminSubscription.getSubscriberName());
         assertEquals("12345678910", adminSubscription.getSubscriberId());
-        assertEquals("MTH-12345678910", adminSubscription.getUniqueCode());
         assertEquals("12345678910", adminSubscription.getSubscriptionBoxId());
         assertEquals(SubscriptionStatus.PENDING.getValue(), adminSubscription.getSubscriptionStatus());
     }

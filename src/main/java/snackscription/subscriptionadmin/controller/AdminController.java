@@ -1,37 +1,51 @@
 package snackscription.subscriptionadmin.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 import snackscription.subscriptionadmin.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
-    @Autowired
-    private AdminService service;
+    private final AdminService adminService;
 
-    @GetMapping("")
-    public String adminPage(Model model) {
-        AdminSubscription adminSubscription = new AdminSubscription();
-        model.addAttribute("adminSubscription", adminSubscription);
-        return "admin";
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     @PostMapping("/create")
-    public String createAdminSubscription(@ModelAttribute AdminSubscription adminSubscription, Model model) {
-        service.create(adminSubscription);
-        return "redirect:admin";
+    public ResponseEntity<AdminSubscription> create(@RequestBody AdminDTO adminDTO) {
+        AdminSubscription adminSubscription = adminService.create(adminDTO);
+        return new ResponseEntity<>(adminSubscription, HttpStatus.CREATED);
     }
 
     @GetMapping("/list")
-    public String subscriptionListPage(Model model){
-        List<AdminSubscription> adminSubscriptions = service.findAll();
-        model.addAttribute("adminSubscriptions", adminSubscriptions);
-        return "adminSubscriptionList";
+    public ResponseEntity<List<AdminDTO>> findAll() {
+        List<AdminDTO> adminDTOList = adminService.findAll();
+        return new ResponseEntity<>(adminDTOList, HttpStatus.OK);
+    }
+
+    @GetMapping("/{subscriptionId}")
+    public ResponseEntity<AdminDTO> findById(@PathVariable String subscriptionId) {
+        AdminDTO adminDTO = adminService.findById(subscriptionId);
+        return new ResponseEntity<>(adminDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<AdminSubscription> update(@RequestBody AdminDTO adminDTO) {
+        AdminSubscription adminSubscription = adminService.update(adminDTO);
+        return new ResponseEntity<>(adminSubscription, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{subscriptionId}")
+    public ResponseEntity<Void> delete(@PathVariable String subscriptionId) {
+        adminService.delete(subscriptionId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

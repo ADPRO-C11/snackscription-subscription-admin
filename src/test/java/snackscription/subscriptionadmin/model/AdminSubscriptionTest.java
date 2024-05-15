@@ -14,10 +14,10 @@ class AdminSubscriptionTest {
         this.adminSubscription = new AdminSubscription();
         this.adminSubscription.setSubscriberName("Hwang Hyunjin");
         this.adminSubscription.setSubscriberId("12345678910");
-        this.adminSubscription.setSubscriptionId("12345678910");
-        this.adminSubscription.setUniqueCode("MTH-12345678910");
+        this.adminSubscription.setSubscriptionId("1234567890");
+        this.adminSubscription.setSubscriptionType("MONTHLY");
+        this.adminSubscription.setUniqueCode("MONTHLY");
         this.adminSubscription.setSubscriptionBoxId("12345678910");
-
         this.adminSubscription.setSubscriptionStatus(SubscriptionStatus.PENDING.getValue());
     }
 
@@ -33,12 +33,12 @@ class AdminSubscriptionTest {
 
     @Test
     void testGetSubscriptionId() {
-        assertEquals("12345678910", this.adminSubscription.getSubscriptionId());
+        assertEquals("1234567890", this.adminSubscription.getSubscriptionId());
     }
 
     @Test
     void testGetUniqueCode() {
-        assertEquals("MTH-12345678910", this.adminSubscription.getUniqueCode());
+        assertTrue(adminSubscription.getUniqueCode().startsWith("MTH-"));
     }
 
     @Test
@@ -63,5 +63,4 @@ class AdminSubscriptionTest {
             this.adminSubscription.setSubscriptionStatus("INVALID");
         });
     }
-
 }

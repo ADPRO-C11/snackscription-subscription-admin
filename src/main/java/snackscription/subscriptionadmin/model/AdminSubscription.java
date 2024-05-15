@@ -1,39 +1,67 @@
 package snackscription.subscriptionadmin.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import snackscription.subscriptionadmin.enums.SubscriptionStatus;
 
 import java.util.UUID;
 
-@Getter @Setter
+@Entity
+@Getter
+@Setter
+@Table(name = "admin_subscription")
 public class AdminSubscription {
-    String subscriberName;
-    String subscriberId;
-    String uniqueCode;
+    @Id
     String subscriptionId;
+
+    @Column(name = "unique_code", unique = true)
+    String uniqueCode;
+
+    @Column(name = "subscription_type")
+    String subscriptionType;
+
+    @Column(name = "subscriber_name")
+    String subscriberName;
+
+    @Column(name = "subscriber_id")
+    String subscriberId;
+
+    @Column(name = "subscription_box_id")
     String subscriptionBoxId;
+
+    @Column(name = "subscription_status")
     String subscriptionStatus;
 
     public AdminSubscription() {
         this.subscriptionId = UUID.randomUUID().toString();
     }
 
-    public AdminSubscription(String subscriberName, String subscriberId, String uniqueCode, String subscriptionBoxId, String subscriptionStatus) {
+    public AdminSubscription(String subscriptionType, String subscriberName, String subscriberId, String subscriptionBoxId) {
         this.subscriptionId = UUID.randomUUID().toString();
 
         this.subscriberName = subscriberName;
         this.subscriberId = subscriberId;
 
-        if (!uniqueCode.startsWith("MTH-") && !uniqueCode.startsWith("QTR-") && !uniqueCode.startsWith("SAA-")) {
-            throw new IllegalArgumentException("Invalid unique code");
-        }
+        this.subscriptionType = subscriptionType;
+        this.setUniqueCode(subscriptionType);
 
-        this.uniqueCode = uniqueCode;
         this.subscriptionBoxId = subscriptionBoxId;
-        this.getSubscriptionStatus();
-        this.setSubscriptionStatus(subscriptionStatus);
+        this.setSubscriptionStatus(SubscriptionStatus.PENDING.getValue());
+    }
+
+    public void setUniqueCode(String subscriptionType) {
+        String prefix = switch (subscriptionType) {
+            case "MONTHLY" -> "MTH-";
+            case "QUARTERLY" -> "QTR-";
+            case "SEMI-ANNUAL" -> "SAA-";
+            default -> throw new IllegalArgumentException("Invalid type");
+        };
+
+        String randomPart = UUID.randomUUID().toString();
+        randomPart = randomPart.replace("-", "").toUpperCase().substring(0, 16);
+        this.uniqueCode = prefix + randomPart;
     }
 
     public void setSubscriptionStatus(String subscriptionStatus) {
