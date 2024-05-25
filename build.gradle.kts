@@ -3,6 +3,7 @@ plugins {
 	jacoco
 	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "snackscription"
@@ -61,6 +62,14 @@ tasks.register<Test>("functionalTest") {
 
 	filter {
 		includeTestsMatching("*FunctionalTest")
+	}
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "ADPRO-C11_snackscription-subscription-admin")
+		property("sonar.organization", "adpro-c11")
+		property("sonar.host.url", "https://sonarcloud.io")
 	}
 }
 
