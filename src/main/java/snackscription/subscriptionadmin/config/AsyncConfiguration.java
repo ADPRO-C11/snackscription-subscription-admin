@@ -1,22 +1,22 @@
 package snackscription.subscriptionadmin.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
-
 @Configuration
 @EnableAsync
-public class AsyncConfiguration {
-    @Bean("asyncTaskExecutor")
-    public Executor asyncTaskExecutor(){
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(4);
-        taskExecutor.setQueueCapacity(150);
-        taskExecutor.setThreadNamePrefix("AsyncTaskThread-");
-        taskExecutor.initialize();
-        return taskExecutor;
+public class AsyncConfiguration implements AsyncConfigurer {
+    @Override
+    public AsyncTaskExecutor getAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("Async-Executor-");
+        executor.initialize();
+        return executor;
     }
 }
