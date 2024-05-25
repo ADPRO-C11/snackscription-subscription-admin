@@ -8,6 +8,7 @@ import snackscription.subscriptionadmin.service.AdminService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -29,26 +30,38 @@ public class AdminController {
 
     @GetMapping("/list")
     public CompletableFuture<ResponseEntity<List<AdminDTO>>> findAll() {
-        return adminService.findAll().thenApply(ResponseEntity::ok)
-                .exceptionally(ex -> ResponseEntity.badRequest().build());
+        return adminService.findAll().thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{subscriptionId}")
-    public CompletableFuture<ResponseEntity<Optional<AdminDTO>>> findById(@PathVariable String subscriptionId) {
+    public CompletableFuture<ResponseEntity<AdminDTO>> findById(@PathVariable String subscriptionId) {
+        try {
+            UUID.fromString(subscriptionId);
+        } catch (IllegalArgumentException e) {
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+        }
         return adminService.findById(subscriptionId).thenApply(ResponseEntity::ok)
-                .exceptionally(ex -> ResponseEntity.badRequest().build());
+                .exceptionally(ex -> ResponseEntity.notFound().build());
     }
-
 
     @PutMapping("/update")
     public CompletableFuture<ResponseEntity<AdminSubscription>> update(@RequestBody AdminDTO adminDTO) {
+        if (adminDTO.getSubscriptionId() == null) {
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+        }
+
         return adminService.update(adminDTO).thenApply(ResponseEntity::ok)
-                .exceptionally(ex -> ResponseEntity.badRequest().build());
+                .exceptionally(ex -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{subscriptionId}")
     public CompletableFuture<ResponseEntity<String>> delete(@PathVariable String subscriptionId) {
-        return adminService.delete(subscriptionId).thenApply(result -> ResponseEntity.ok("DELETE SUCCESS"))
+        try {
+            UUID.fromString(subscriptionId);
+        } catch (IllegalArgumentException e) {
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+        }
+        return adminService.delete(subscriptionId).thenApply(deleted -> ResponseEntity.ok("DELETE SUCCESS"))
                 .exceptionally(ex -> ResponseEntity.notFound().build());
     }
 }

@@ -5,9 +5,11 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import snackscription.subscriptionadmin.controller.AdminController;
 import snackscription.subscriptionadmin.dto.AdminDTO;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+@ExtendWith(MockitoExtension.class)
 public class AdminServiceImplTest {
 
     @Mock
@@ -53,13 +56,12 @@ public class AdminServiceImplTest {
         adminSubscription.setSubscriberId("0325");
         adminSubscription.setSubscriptionBoxId("143ily");
         adminSubscription.setSubscriptionStatus("PENDING");
-
-        when(adminSubscriptionFactory.create(anyString(), anyString(), anyString(), anyString())).thenReturn(adminSubscription);
     }
+
 
     @Test
     void testCreate() {
-        when(adminRepository.create(adminSubscription)).thenReturn(adminSubscription);
+        when(adminRepository.create(any(AdminSubscription.class))).thenReturn(adminSubscription);
 
         CompletableFuture<AdminSubscription> result = adminService.create(adminDTO);
 
@@ -70,51 +72,49 @@ public class AdminServiceImplTest {
 
     @Test
     void testFindAll() {
-        List<AdminDTO> adminDTOList = List.of(adminDTO);
+        List<AdminSubscription> adminSubscriptions = List.of(adminSubscription);
+        when(adminRepository.findAll()).thenReturn(adminSubscriptions);
 
-        when(adminService.findAll()).thenReturn(CompletableFuture.completedFuture(adminDTOList));
-
-        CompletableFuture<ResponseEntity<List<AdminDTO>>> result = adminController.findAll();
+        CompletableFuture<List<AdminDTO>> result = adminService.findAll();
 
         assertNotNull(result);
         assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(adminDTOList), result.join());
+        assertEquals(List.of(adminDTO), result.join());
     }
 
     @Test
     void testFindById() {
-        Optional<AdminDTO> adminDTOOptional = Optional.of(adminDTO);
+        String id = "1";
+        when(adminRepository.findById(id)).thenReturn(Optional.of(adminSubscription));
 
-        when(adminRepository.findById(anyString())).thenReturn(Optional.of(adminSubscription));
-        when(adminService.findById(anyString())).thenReturn(CompletableFuture.completedFuture(adminDTOOptional));
-
-        CompletableFuture<ResponseEntity<Optional<AdminDTO>>> result = adminController.findById("1");
+        CompletableFuture<AdminDTO> result = adminService.findById(id);
 
         assertNotNull(result);
         assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(adminDTOOptional), result.join());
+        assertEquals(adminDTO, result.join());
     }
 
     @Test
     void testUpdate() {
-        when(adminService.findById(adminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(Optional.of(adminDTO)));
-        when(adminService.update(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
+        when(adminRepository.findById(adminDTO.getSubscriptionId())).thenReturn(Optional.of(adminSubscription));
+        when(adminRepository.update(adminSubscription)).thenReturn(adminSubscription);
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> result = adminController.update(adminDTO);
+        CompletableFuture<AdminSubscription> result = adminService.update(adminDTO);
 
         assertNotNull(result);
         assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(adminSubscription), result.join());
+        assertEquals(adminSubscription, result.join());
     }
 
     @Test
     void testDelete() {
-        when(adminService.delete(anyString())).thenReturn(CompletableFuture.completedFuture(null));
+        String id = "1";
+        when(adminRepository.findById(id)).thenReturn(Optional.of(adminSubscription));
 
-        CompletableFuture<ResponseEntity<String>> result = adminController.delete("1");
+        CompletableFuture<Void> result = adminService.delete(id);
 
         assertNotNull(result);
         assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok("DELETE SUCCESS"), result.join());
+        assertNull(result.join());
     }
 }

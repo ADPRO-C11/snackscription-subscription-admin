@@ -8,11 +8,11 @@ import snackscription.subscriptionadmin.dto.AdminDTO;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import snackscription.subscriptionadmin.dto.DTOMapper;
+
 
 @Service
 public class AdminServiceImpl implements AdminService{
@@ -30,23 +30,24 @@ public class AdminServiceImpl implements AdminService{
     @Override
     @Async
     public CompletableFuture<List<AdminDTO>> findAll() {
-        return CompletableFuture.completedFuture(adminRepository.findAll()
-                .stream()
+        List<AdminSubscription> adminSubscriptions = adminRepository.findAll();
+        List<AdminDTO> adminDtos = adminSubscriptions.stream()
                 .map(DTOMapper::convertModelToDto)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        return CompletableFuture.completedFuture(adminDtos);
     }
 
     @Override
     @Async
-    public CompletableFuture<Optional<AdminDTO>> findById(String subscriptionId) {
+    public CompletableFuture<AdminDTO> findById(String subscriptionId) {
         if(subscriptionId == null || subscriptionId.isBlank()){
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
 
-        AdminSubscription adminSubscription = adminRepository.findById(subscriptionId)
+        return adminRepository.findById(subscriptionId)
+                .map(DTOMapper::convertModelToDto)
+                .map(CompletableFuture::completedFuture)
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
-
-        return CompletableFuture.completedFuture(Optional.of(DTOMapper.convertModelToDto(adminSubscription)));
     }
 
     @Override
@@ -56,11 +57,11 @@ public class AdminServiceImpl implements AdminService{
             throw new IllegalArgumentException("AdminDTO cannot be null");
         }
 
-        AdminSubscription adminSubscription = adminRepository.findById(adminDTO.getSubscriptionId())
-                .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
-
-        DTOMapper.updateAdminSubscription(adminSubscription, adminDTO);
-        return CompletableFuture.completedFuture(adminRepository.update(adminSubscription));
+        return adminRepository.findById(adminDTO.getSubscriptionId()).
+                map(adminSubscription -> {
+                    DTOMapper.updateAdminSubscription(adminSubscription, adminDTO);
+                    return CompletableFuture.completedFuture(adminRepository.update(adminSubscription));
+                }).orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
     }
 
     @Override
@@ -70,6 +71,9 @@ public class AdminServiceImpl implements AdminService{
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
 
+        if (adminRepository.findById(subscriptionId).isEmpty()) {
+            throw new IllegalArgumentException("Subscription not found");
+        }
         adminRepository.delete(subscriptionId);
         return CompletableFuture.completedFuture(null);
     }

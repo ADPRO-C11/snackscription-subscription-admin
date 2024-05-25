@@ -11,7 +11,7 @@ import java.util.List;
 public interface AdminService {
     CompletableFuture<AdminSubscription> create(AdminDTO adminDTO);
     CompletableFuture<List<AdminDTO>> findAll();
-    CompletableFuture<Optional<AdminDTO>> findById(String subscriptionId);
+    CompletableFuture<AdminDTO> findById(String subscriptionId);
     CompletableFuture<AdminSubscription> update(AdminDTO adminDTO);
     CompletableFuture<Void> delete(String subscriptionId);
 }

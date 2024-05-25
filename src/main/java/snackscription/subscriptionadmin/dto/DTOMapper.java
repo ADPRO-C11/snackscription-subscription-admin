@@ -10,14 +10,15 @@ import java.util.Optional;
 public class DTOMapper {
 
     public static AdminDTO convertModelToDto(AdminSubscription adminSubscription) {
-        return new AdminDTO(
-                adminSubscription.getSubscriptionId(),
-                adminSubscription.getUniqueCode(),
-                adminSubscription.getSubscriberName(),
-                adminSubscription.getSubscriberId(),
-                adminSubscription.getSubscriptionBoxId(),
-                adminSubscription.getSubscriptionStatus()
-        );
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setSubscriptionId(adminSubscription.getSubscriptionId());
+        adminDTO.setSubscriptionType(adminSubscription.getSubscriptionType());
+        adminDTO.setSubscriberName(adminSubscription.getSubscriberName());
+        adminDTO.setSubscriberId(adminSubscription.getSubscriberId());
+        adminDTO.setSubscriptionBoxId(adminSubscription.getSubscriptionBoxId());
+        adminDTO.setSubscriptionStatus(adminSubscription.getSubscriptionStatus());
+        adminDTO.setUniqueCode(adminSubscription.getUniqueCode());
+        return adminDTO;
     }
 
     public static AdminSubscription convertDTOtoModel(AdminDTO adminDTO) {

@@ -1,6 +1,6 @@
 package snackscription.subscriptionadmin.controller;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -28,7 +28,7 @@ public class AdminControllerTest {
     private AdminDTO adminDTO;
     private AdminSubscription adminSubscription;
 
-    @Test
+    @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
 
@@ -53,54 +53,51 @@ public class AdminControllerTest {
     void testCreate(){
         when(adminService.create(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> result = adminController.create(adminDTO);
-
-        assertNotNull(result);
-        assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(adminSubscription), result.join());
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.create(adminDTO);
+        assertNotNull(response);
+        assertEquals(ResponseEntity.ok(adminSubscription), response.join());
     }
 
     @Test
     void testFindAll(){
-        when(adminService.findAll()).thenReturn(CompletableFuture.completedFuture(Collections.singletonList(adminDTO)));
+        List<AdminDTO> adminDTOList = Collections.singletonList(adminDTO);
+        when(adminService.findAll()).thenReturn(CompletableFuture.completedFuture(adminDTOList));
 
-        CompletableFuture<ResponseEntity<List<AdminDTO>>> result = adminController.findAll();
-
-        assertNotNull(result);
-        assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(Collections.singletonList(adminDTO)), result.join());
+        CompletableFuture<ResponseEntity<List<AdminDTO>>> response = adminController.findAll();
+        assertNotNull(response);
+        assertEquals(ResponseEntity.ok(adminDTOList), response.join());
     }
 
     @Test
     void testFindById(){
-        when(adminService.findById("1")).thenReturn(CompletableFuture.completedFuture(Optional.of(adminDTO)));
+        String validUUID = "8a56e04b-d0c8-4e43-b2e0-fdf43e304d9e";
+        adminDTO.setSubscriptionId(validUUID);
+        adminSubscription.setSubscriptionId(validUUID);
+        when(adminService.findById(validUUID)).thenReturn(CompletableFuture.completedFuture(adminDTO));
 
-        CompletableFuture<ResponseEntity<Optional<AdminDTO>>> result = adminController.findById("1");
+        CompletableFuture<ResponseEntity<AdminDTO>> result = adminController.findById(validUUID);
 
         assertNotNull(result);
         assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(Optional.of(adminDTO)), result.join());
+        assertEquals(ResponseEntity.ok(adminDTO), result.join());
     }
 
     @Test
     void testUpdate(){
         when(adminService.update(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> result = adminController.update(adminDTO);
-
-        assertNotNull(result);
-        assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok(adminSubscription), result.join());
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+        assertNotNull(response);
+        assertEquals(ResponseEntity.ok(adminSubscription), response.join());
     }
 
     @Test
     void testDelete(){
-        when(adminService.delete("1")).thenReturn(CompletableFuture.completedFuture(null));
+        String validUUID = "8a56e04b-d0c8-4e43-b2e0-fdf43e304d9e";
+        when(adminService.delete(validUUID)).thenReturn(CompletableFuture.completedFuture(null));
 
-        CompletableFuture<ResponseEntity<String>> result = adminController.delete("1");
-
-        assertNotNull(result);
-        assertTrue(result.isDone());
-        assertEquals(ResponseEntity.ok("DELETE SUCCESS"), result.join());
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validUUID);
+        assertNotNull(response);
+        assertEquals(ResponseEntity.ok("DELETE SUCCESS"), response.join());
     }
 }
