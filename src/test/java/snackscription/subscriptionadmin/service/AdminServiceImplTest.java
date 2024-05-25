@@ -5,17 +5,23 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+import snackscription.subscriptionadmin.controller.AdminController;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.factory.AdminSubscriptionFactory;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 import snackscription.subscriptionadmin.repository.AdminRepository;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+@ExtendWith(MockitoExtension.class)
 public class AdminServiceImplTest {
 
     @Mock
@@ -26,6 +32,7 @@ public class AdminServiceImplTest {
 
     @InjectMocks
     private AdminServiceImpl adminService;
+    private AdminController adminController;
 
     private AdminSubscription adminSubscription;
     private AdminDTO adminDTO;
@@ -49,39 +56,65 @@ public class AdminServiceImplTest {
         adminSubscription.setSubscriberId("0325");
         adminSubscription.setSubscriptionBoxId("143ily");
         adminSubscription.setSubscriptionStatus("PENDING");
-
-        when(adminSubscriptionFactory.create(anyString(), anyString(), anyString(), anyString())).thenReturn(adminSubscription);
     }
+
 
     @Test
     void testCreate() {
         when(adminRepository.create(any(AdminSubscription.class))).thenReturn(adminSubscription);
 
-        AdminSubscription result = adminService.create(adminDTO);
+        CompletableFuture<AdminSubscription> result = adminService.create(adminDTO);
 
         assertNotNull(result);
-        assertEquals(adminSubscription, result);
+        assertTrue(result.isDone());
+        assertEquals(adminSubscription, result.join());
     }
 
     @Test
     void testFindAll() {
-        when(adminRepository.findAll()).thenReturn(Collections.singletonList(adminSubscription));
+        List<AdminSubscription> adminSubscriptions = List.of(adminSubscription);
+        when(adminRepository.findAll()).thenReturn(adminSubscriptions);
 
-        List<AdminDTO> result = adminService.findAll();
+        CompletableFuture<List<AdminDTO>> result = adminService.findAll();
 
-        assertEquals(1, result.size());
-        assertEquals(adminSubscription.getSubscriptionId(), result.get(0).getSubscriptionId());
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertEquals(List.of(adminDTO), result.join());
     }
 
     @Test
     void testFindById() {
-        String subscriptionId = "1";
+        String id = "1";
+        when(adminRepository.findById(id)).thenReturn(Optional.of(adminSubscription));
 
-        when(adminRepository.findById(subscriptionId)).thenReturn(java.util.Optional.of(adminSubscription));
-
-        AdminDTO result = adminService.findById(subscriptionId);
+        CompletableFuture<AdminDTO> result = adminService.findById(id);
 
         assertNotNull(result);
-        assertEquals(adminSubscription.getSubscriptionId(), result.getSubscriptionId());
+        assertTrue(result.isDone());
+        assertEquals(adminDTO, result.join());
+    }
+
+    @Test
+    void testUpdate() {
+        when(adminRepository.findById(adminDTO.getSubscriptionId())).thenReturn(Optional.of(adminSubscription));
+        when(adminRepository.update(adminSubscription)).thenReturn(adminSubscription);
+
+        CompletableFuture<AdminSubscription> result = adminService.update(adminDTO);
+
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertEquals(adminSubscription, result.join());
+    }
+
+    @Test
+    void testDelete() {
+        String id = "1";
+        when(adminRepository.findById(id)).thenReturn(Optional.of(adminSubscription));
+
+        CompletableFuture<Void> result = adminService.delete(id);
+
+        assertNotNull(result);
+        assertTrue(result.isDone());
+        assertNull(result.join());
     }
 }
