@@ -21,6 +21,11 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @GetMapping("")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("Snackscription - Admin Subscription Management API");
+    }
+
     @PostMapping("/create")
     public CompletableFuture<ResponseEntity<AdminSubscription>> create(@RequestBody AdminDTO adminDTO) {
         return adminService.create(adminDTO).thenApply(ResponseEntity::ok)
@@ -50,7 +55,12 @@ public class AdminController {
             return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
 
-        return adminService.update(adminDTO).thenApply(ResponseEntity::ok)
+        CompletableFuture<AdminSubscription> updatedSubscription = adminService.update(adminDTO);
+        if(updatedSubscription == null) {
+            return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+        }
+
+        return updatedSubscription.thenApply(ResponseEntity::ok)
                 .exceptionally(ex -> ResponseEntity.notFound().build());
     }
 
@@ -61,7 +71,11 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
-        return adminService.delete(subscriptionId).thenApply(deleted -> ResponseEntity.ok("DELETE SUCCESS"))
-                .exceptionally(ex -> ResponseEntity.notFound().build());
+        try {
+            return adminService.delete(subscriptionId).thenApply(deleted -> ResponseEntity.ok("DELETE SUCCESS"))
+                    .exceptionally(ex -> ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException e) {
+            return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+        }
     }
 }

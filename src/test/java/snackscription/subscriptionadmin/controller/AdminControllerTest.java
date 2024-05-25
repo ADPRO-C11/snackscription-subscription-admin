@@ -11,8 +11,8 @@ import snackscription.subscriptionadmin.service.AdminService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -47,6 +47,13 @@ public class AdminControllerTest {
         adminSubscription.setSubscriberId("0325");
         adminSubscription.setSubscriptionBoxId("143ily");
         adminSubscription.setSubscriptionStatus("PENDING");
+    }
+
+    @Test
+    void testHome(){
+        ResponseEntity<String> response = adminController.home();
+        assertNotNull(response);
+        assertEquals(ResponseEntity.ok("Snackscription - Admin Subscription Management API"), response);
     }
 
     @Test
@@ -99,5 +106,52 @@ public class AdminControllerTest {
         CompletableFuture<ResponseEntity<String>> response = adminController.delete(validUUID);
         assertNotNull(response);
         assertEquals(ResponseEntity.ok("DELETE SUCCESS"), response.join());
+    }
+
+    @Test
+    void testUpdateInvalidSubscriptionId(){
+        AdminDTO adminDTO = new AdminDTO();
+
+        CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+
+        assertTrue(response.isDone());
+        assertEquals(expectedResponse.join(), response.join());
+    }
+
+    @Test
+    void testUpdateNonexistentSubscription(){
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setSubscriptionId(UUID.randomUUID().toString());
+        CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+
+        when(adminService.findById(adminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(null));
+
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+
+        assertTrue(response.isDone());
+        assertEquals(expectedResponse.join(), response.join());
+    }
+
+    @Test
+    void testDeleteInvalidSubscriptionId(){
+        CompletableFuture<ResponseEntity<String>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete("invalid-id");
+
+        assertTrue(response.isDone());
+        assertEquals(expectedResponse.join(), response.join());
+    }
+
+    @Test
+    void testDeleteNonexistentSubscription(){
+        String validUUID = UUID.randomUUID().toString();
+        CompletableFuture<ResponseEntity<String>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+
+        when(adminService.delete(validUUID)).thenThrow(new IllegalArgumentException("Subscription not found"));
+
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validUUID);
+
+        assertTrue(response.isDone());
+        assertEquals(expectedResponse.join(), response.join());
     }
 }
