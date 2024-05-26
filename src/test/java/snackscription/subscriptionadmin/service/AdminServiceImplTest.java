@@ -10,8 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import snackscription.subscriptionadmin.controller.AdminController;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.factory.AdminSubscriptionFactory;
 import snackscription.subscriptionadmin.model.AdminSubscription;
@@ -28,14 +26,13 @@ public class AdminServiceImplTest {
     private AdminRepository adminRepository;
 
     @Mock
-    private AdminSubscriptionFactory adminSubscriptionFactory;
+    private AdminDTO adminDTO;
 
     @InjectMocks
     private AdminServiceImpl adminService;
-    private AdminController adminController;
 
+    @Mock
     private AdminSubscription adminSubscription;
-    private AdminDTO adminDTO;
 
     @BeforeEach
     void setUp() {
@@ -116,5 +113,51 @@ public class AdminServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isDone());
         assertNull(result.join());
+    }
+
+    @Test
+    void findByIdNullOrEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            adminService.findById(null).join();
+            adminService.findById("").join();
+        });
+    }
+
+    @Test
+    void updateNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.update(null).join());
+    }
+
+    @Test
+    void updateNonExistent() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            when(adminRepository.findById(adminDTO.getSubscriptionId())).thenReturn(Optional.empty());
+            adminService.update(adminDTO).join();
+        });
+    }
+
+    @Test
+    void deleteNullOrEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            adminService.delete(null).join();
+            adminService.delete("").join();
+        });
+    }
+
+    @Test
+    void deleteNonExistent() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            String id = "non-existent-id";
+            when(adminRepository.findById(id)).thenReturn(Optional.empty());
+            adminService.delete(id).join();
+        });
+    }
+
+    @Test
+    void createInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            AdminDTO invalidDTO = new AdminDTO();
+            adminService.create(invalidDTO).join();
+        });
     }
 }

@@ -23,6 +23,9 @@ public class AdminServiceImpl implements AdminService{
     @Override
     @Async
     public CompletableFuture<AdminSubscription> create(AdminDTO adminDTO) {
+        if (adminDTO == null || adminDTO.getSubscriptionId() == null) {
+            throw new IllegalArgumentException("AdminDTO cannot be null and must have a valid subscriptionId");
+        }
         AdminSubscription adminSubscription = DTOMapper.convertDTOtoModel(adminDTO);
         return CompletableFuture.completedFuture(adminRepository.create(adminSubscription));
     }

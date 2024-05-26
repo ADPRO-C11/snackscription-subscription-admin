@@ -3,6 +3,7 @@ plugins {
 	jacoco
 	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "snackscription"
@@ -41,6 +42,22 @@ dependencies {
 	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
 	testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
 	testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+	runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.12.5")
+	implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.5")
+	implementation("me.paulschwarz:spring-dotenv:4.0.0")
+	implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "ADPRO-C11_snackscription-subscription-admin")
+		property("sonar.organization", "adpro-c11")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
 }
 
 tasks.register<Test>("unitTest") {
