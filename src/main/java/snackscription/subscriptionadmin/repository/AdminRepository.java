@@ -3,6 +3,7 @@ package snackscription.subscriptionadmin.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 
@@ -11,11 +12,8 @@ import java.util.Optional;
 
 @Repository
 public class AdminRepository {
-    private final EntityManager entityManager;
-
-    public AdminRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+    @Autowired
+    private EntityManager entityManager;
 
     @Transactional
     public AdminSubscription create(AdminSubscription adminSubscription) {
