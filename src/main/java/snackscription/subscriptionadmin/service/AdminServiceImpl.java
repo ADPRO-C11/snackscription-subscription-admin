@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import snackscription.subscriptionadmin.dto.DTOMapper;
 
@@ -19,6 +18,8 @@ public class AdminServiceImpl implements AdminService{
 
     @Autowired
     private AdminRepository adminRepository;
+
+    private static final String SUBSCRIPTION_NOT_FOUND = "Subscription not found";
 
     @Override
     @Async
@@ -36,7 +37,7 @@ public class AdminServiceImpl implements AdminService{
         List<AdminSubscription> adminSubscriptions = adminRepository.findAll();
         List<AdminDTO> adminDtos = adminSubscriptions.stream()
                 .map(DTOMapper::convertModelToDto)
-                .collect(Collectors.toList());
+                .toList();
         return CompletableFuture.completedFuture(adminDtos);
     }
 
@@ -50,7 +51,7 @@ public class AdminServiceImpl implements AdminService{
         return adminRepository.findById(subscriptionId)
                 .map(DTOMapper::convertModelToDto)
                 .map(CompletableFuture::completedFuture)
-                .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+                .orElseThrow(() -> new IllegalArgumentException(SUBSCRIPTION_NOT_FOUND));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AdminServiceImpl implements AdminService{
                 map(adminSubscription -> {
                     DTOMapper.updateAdminSubscription(adminSubscription, adminDTO);
                     return CompletableFuture.completedFuture(adminRepository.update(adminSubscription));
-                }).orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+                }).orElseThrow(() -> new IllegalArgumentException(SUBSCRIPTION_NOT_FOUND));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class AdminServiceImpl implements AdminService{
         }
 
         if (adminRepository.findById(subscriptionId).isEmpty()) {
-            throw new IllegalArgumentException("Subscription not found");
+            throw new IllegalArgumentException(SUBSCRIPTION_NOT_FOUND);
         }
         adminRepository.delete(subscriptionId);
         return CompletableFuture.completedFuture(null);

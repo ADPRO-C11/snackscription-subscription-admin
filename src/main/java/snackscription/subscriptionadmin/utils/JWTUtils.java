@@ -1,6 +1,5 @@
 package snackscription.subscriptionadmin.utils;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +15,11 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtils {
-    private final SecretKey KEY;
+    private final SecretKey key;
 
     public JWTUtils(@Value("${JWT_SECRET}") String jwtSecret) {
         byte[] keyBytes = Base64.getDecoder().decode(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        this.KEY = new SecretKeySpec(keyBytes, "HmacSHA256");
+        this.key = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
     public String extractRole(String token) {
@@ -28,7 +27,7 @@ public class JWTUtils {
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction){
-        return claimsTFunction.apply(Jwts.parser().verifyWith(KEY).build().parseSignedClaims(token).getPayload());
+        return claimsTFunction.apply(Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload());
     }
 
     public boolean isTokenValid(String token) {

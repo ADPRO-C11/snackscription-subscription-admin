@@ -39,13 +39,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
+	implementation("me.paulschwarz:spring-dotenv:$springDotenvVersion")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	runtimeOnly("org.postgresql:postgresql")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
-	implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -53,7 +54,6 @@ dependencies {
 	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
 	testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
 	testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-	implementation("me.paulschwarz:spring-dotenv:$springDotenvVersion")
 }
 
 sonar {

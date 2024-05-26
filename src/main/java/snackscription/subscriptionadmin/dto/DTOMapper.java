@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Component
 public class DTOMapper {
-
     public static AdminDTO convertModelToDto(AdminSubscription adminSubscription) {
         AdminDTO adminDTO = new AdminDTO();
         adminDTO.setSubscriptionId(adminSubscription.getSubscriptionId());

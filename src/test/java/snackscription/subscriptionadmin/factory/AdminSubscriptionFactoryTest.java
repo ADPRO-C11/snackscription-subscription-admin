@@ -6,7 +6,7 @@ import snackscription.subscriptionadmin.model.AdminSubscription;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AdminSubscriptionFactoryTest {
+class AdminSubscriptionFactoryTest {
     @Test
     void testCreateAdminSubscription() {
         AdminSubscriptionFactory adminSubscriptionFactory = new AdminSubscriptionFactory();

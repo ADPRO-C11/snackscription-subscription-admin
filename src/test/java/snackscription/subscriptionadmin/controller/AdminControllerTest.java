@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AdminControllerTest {
+class AdminControllerTest {
 
     @Mock
     private AdminService adminService;
@@ -118,10 +118,10 @@ public class AdminControllerTest {
 
     @Test
     void testUpdateInvalidSubscriptionId() throws IllegalAccessException{
-        AdminDTO adminDTO = new AdminDTO();
+        AdminDTO localAdminDTO = new AdminDTO();
 
         CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, localAdminDTO);
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());
@@ -129,13 +129,13 @@ public class AdminControllerTest {
 
     @Test
     void testUpdateNonexistentSubscription() throws IllegalAccessException{
-        AdminDTO adminDTO = new AdminDTO();
-        adminDTO.setSubscriptionId(UUID.randomUUID().toString());
+        AdminDTO localAdminDTO = new AdminDTO();
+        localAdminDTO.setSubscriptionId(UUID.randomUUID().toString());
         CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.notFound().build());
 
-        when(adminService.findById(adminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(null));
+        when(adminService.findById(localAdminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(null));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, localAdminDTO);
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());

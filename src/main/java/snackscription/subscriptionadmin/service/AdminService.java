@@ -3,7 +3,6 @@ package snackscription.subscriptionadmin.service;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import java.util.List;
