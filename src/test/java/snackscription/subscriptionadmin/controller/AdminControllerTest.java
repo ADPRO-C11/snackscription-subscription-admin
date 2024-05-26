@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 import snackscription.subscriptionadmin.service.AdminService;
+import snackscription.subscriptionadmin.utils.JWTUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +23,16 @@ public class AdminControllerTest {
     @Mock
     private AdminService adminService;
 
+    @Mock
+    private JWTUtils jwtUtils;
+
     @InjectMocks
     private AdminController adminController;
 
     private AdminDTO adminDTO;
     private AdminSubscription adminSubscription;
+    private final String validToken =
+            "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MTY0NTUyMzgsImV4cCI6MTcxNjU0MTYzOH0.D5PKsxm3jr7SybMfsBylQqd2lT8S_cuX3jQWGolOD78";
 
     @BeforeEach
     void setUp(){
@@ -47,6 +53,8 @@ public class AdminControllerTest {
         adminSubscription.setSubscriberId("0325");
         adminSubscription.setSubscriptionBoxId("143ily");
         adminSubscription.setSubscriptionStatus("PENDING");
+
+        when(jwtUtils.isTokenValid(validToken)).thenReturn(true);
     }
 
     @Test
@@ -57,32 +65,32 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testCreate(){
+    void testCreate() throws IllegalAccessException{
         when(adminService.create(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.create(adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.create(validToken, adminDTO);
         assertNotNull(response);
         assertEquals(ResponseEntity.ok(adminSubscription), response.join());
     }
 
     @Test
-    void testFindAll(){
+    void testFindAll() throws IllegalAccessException{
         List<AdminDTO> adminDTOList = Collections.singletonList(adminDTO);
         when(adminService.findAll()).thenReturn(CompletableFuture.completedFuture(adminDTOList));
 
-        CompletableFuture<ResponseEntity<List<AdminDTO>>> response = adminController.findAll();
+        CompletableFuture<ResponseEntity<List<AdminDTO>>> response = adminController.findAll(validToken);
         assertNotNull(response);
         assertEquals(ResponseEntity.ok(adminDTOList), response.join());
     }
 
     @Test
-    void testFindById(){
+    void testFindById() throws IllegalAccessException{
         String validUUID = "8a56e04b-d0c8-4e43-b2e0-fdf43e304d9e";
         adminDTO.setSubscriptionId(validUUID);
         adminSubscription.setSubscriptionId(validUUID);
         when(adminService.findById(validUUID)).thenReturn(CompletableFuture.completedFuture(adminDTO));
 
-        CompletableFuture<ResponseEntity<AdminDTO>> result = adminController.findById(validUUID);
+        CompletableFuture<ResponseEntity<AdminDTO>> result = adminController.findById(validToken, validUUID);
 
         assertNotNull(result);
         assertTrue(result.isDone());
@@ -90,66 +98,66 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testUpdate(){
+    void testUpdate() throws IllegalAccessException{
         when(adminService.update(adminDTO)).thenReturn(CompletableFuture.completedFuture(adminSubscription));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, adminDTO);
         assertNotNull(response);
         assertEquals(ResponseEntity.ok(adminSubscription), response.join());
     }
 
     @Test
-    void testDelete(){
+    void testDelete() throws IllegalAccessException{
         String validUUID = "8a56e04b-d0c8-4e43-b2e0-fdf43e304d9e";
         when(adminService.delete(validUUID)).thenReturn(CompletableFuture.completedFuture(null));
 
-        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validUUID);
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validToken, validUUID);
         assertNotNull(response);
         assertEquals(ResponseEntity.ok("DELETE SUCCESS"), response.join());
     }
 
     @Test
-    void testUpdateInvalidSubscriptionId(){
+    void testUpdateInvalidSubscriptionId() throws IllegalAccessException{
         AdminDTO adminDTO = new AdminDTO();
 
         CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, adminDTO);
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());
     }
 
     @Test
-    void testUpdateNonexistentSubscription(){
+    void testUpdateNonexistentSubscription() throws IllegalAccessException{
         AdminDTO adminDTO = new AdminDTO();
         adminDTO.setSubscriptionId(UUID.randomUUID().toString());
         CompletableFuture<ResponseEntity<AdminSubscription>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.notFound().build());
 
         when(adminService.findById(adminDTO.getSubscriptionId())).thenReturn(CompletableFuture.completedFuture(null));
 
-        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(adminDTO);
+        CompletableFuture<ResponseEntity<AdminSubscription>> response = adminController.update(validToken, adminDTO);
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());
     }
 
     @Test
-    void testDeleteInvalidSubscriptionId(){
+    void testDeleteInvalidSubscriptionId() throws IllegalAccessException{
         CompletableFuture<ResponseEntity<String>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
-        CompletableFuture<ResponseEntity<String>> response = adminController.delete("invalid-id");
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validToken, "invalid-id");
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());
     }
 
     @Test
-    void testDeleteNonexistentSubscription(){
+    void testDeleteNonexistentSubscription() throws IllegalAccessException{
         String validUUID = UUID.randomUUID().toString();
         CompletableFuture<ResponseEntity<String>> expectedResponse = CompletableFuture.completedFuture(ResponseEntity.notFound().build());
 
         when(adminService.delete(validUUID)).thenThrow(new IllegalArgumentException("Subscription not found"));
 
-        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validUUID);
+        CompletableFuture<ResponseEntity<String>> response = adminController.delete(validToken, validUUID);
 
         assertTrue(response.isDone());
         assertEquals(expectedResponse.join(), response.join());

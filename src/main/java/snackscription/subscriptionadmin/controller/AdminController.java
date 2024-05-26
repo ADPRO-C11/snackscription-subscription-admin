@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import snackscription.subscriptionadmin.dto.AdminDTO;
 import snackscription.subscriptionadmin.model.AdminSubscription;
 import snackscription.subscriptionadmin.service.AdminService;
+import snackscription.subscriptionadmin.utils.JWTUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +17,18 @@ import java.util.concurrent.CompletableFuture;
 @CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
     private final AdminService adminService;
+    private final JWTUtils jwtUtils;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, JWTUtils jwtUtils) {
         this.adminService = adminService;
+        this.jwtUtils = jwtUtils;
+    }
+
+    private void validateToken(String token) throws IllegalAccessException {
+        String jwt = token.replace("Bearer ", "");
+        if (!jwtUtils.isTokenValid(jwt)) {
+            throw new IllegalAccessException("You have no permission.");
+        }
     }
 
     @GetMapping("")
@@ -27,19 +37,23 @@ public class AdminController {
     }
 
     @PostMapping("/create")
-    public CompletableFuture<ResponseEntity<AdminSubscription>> create(@RequestBody AdminDTO adminDTO) {
+    public CompletableFuture<ResponseEntity<AdminSubscription>> create(@RequestHeader(value="Authorization") String token, @RequestBody AdminDTO adminDTO)
+            throws IllegalAccessException {
+        validateToken(token);
         return adminService.create(adminDTO).thenApply(ResponseEntity::ok)
                 .exceptionally(ex -> ResponseEntity.badRequest().build());
 
     }
 
     @GetMapping("/list")
-    public CompletableFuture<ResponseEntity<List<AdminDTO>>> findAll() {
+    public CompletableFuture<ResponseEntity<List<AdminDTO>>> findAll(@RequestHeader(value="Authorization") String token) throws IllegalAccessException {
+        validateToken(token);
         return adminService.findAll().thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{subscriptionId}")
-    public CompletableFuture<ResponseEntity<AdminDTO>> findById(@PathVariable String subscriptionId) {
+    public CompletableFuture<ResponseEntity<AdminDTO>> findById(@RequestHeader(value="Authorization") String token, @PathVariable String subscriptionId) throws IllegalAccessException {
+        validateToken(token);
         try {
             UUID.fromString(subscriptionId);
         } catch (IllegalArgumentException e) {
@@ -50,7 +64,8 @@ public class AdminController {
     }
 
     @PutMapping("/update")
-    public CompletableFuture<ResponseEntity<AdminSubscription>> update(@RequestBody AdminDTO adminDTO) {
+    public CompletableFuture<ResponseEntity<AdminSubscription>> update(@RequestHeader(value="Authorization") String token, @RequestBody AdminDTO adminDTO) throws IllegalAccessException {
+        validateToken(token);
         if (adminDTO.getSubscriptionId() == null) {
             return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
@@ -65,7 +80,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/{subscriptionId}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable String subscriptionId) {
+    public CompletableFuture<ResponseEntity<String>> delete(@RequestHeader(value="Authorization") String token, @PathVariable String subscriptionId) throws IllegalAccessException{
+        validateToken(token);
         try {
             UUID.fromString(subscriptionId);
         } catch (IllegalArgumentException e) {

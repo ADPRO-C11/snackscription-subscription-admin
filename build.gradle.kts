@@ -52,6 +52,14 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 }
 
+sonar {
+	properties {
+		property("sonar.projectKey", "ADPRO-C11_snackscription-subscription-admin")
+		property("sonar.organization", "adpro-c11")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
+}
+
 tasks.register<Test>("unitTest") {
 	description = "Runs unit tests."
 	group = "verification"
@@ -67,14 +75,6 @@ tasks.register<Test>("functionalTest") {
 
 	filter {
 		includeTestsMatching("*FunctionalTest")
-	}
-}
-
-sonar {
-	properties {
-		property("sonar.projectKey", "ADPRO-C11_snackscription-subscription-admin")
-		property("sonar.organization", "adpro-c11")
-		property("sonar.host.url", "https://sonarcloud.io")
 	}
 }
 
